@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+pip-wheel-metadata/
+local_settings.py
+db.sqlite3
+
+# Django
+.DS_Store
+*.log
+staticfiles/
+mediafiles/
+
+# Environment
+.env*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+build/
+dist/
+.npm/
+
+# Editor
+.idea/
+.vscode/

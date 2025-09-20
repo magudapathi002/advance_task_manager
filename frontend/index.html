@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" id="logo_title" type="image/svg+xml" href="./src/assets/task-management.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Management</title>
+  </head>
+  <body>
+      <style>
+    #logo_title[href] {
+  transition: filter 0.3s ease; /* Adds a smooth transition effect */
+}
+
+#logo_title[href]:hover {
+  filter: invert(100%);
+  
+}
+  </style>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

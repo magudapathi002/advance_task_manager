@@ -70,7 +70,6 @@ const ToolpadDashboardLayout: React.FC<Props> = ({ children }) => {
     user: {
       name: auth?.user_info?.first_name,
       email: auth?.user_info?.email,
-      image:auth?.user_info?.first_name
     },
   };
 

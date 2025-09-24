@@ -11,7 +11,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useCreateTask, useUpdateTask, statusOptions, priorityOptions } from "../hooks/useTasks";
-import type { Task } from "../types/Authtypes";
+import { useUsers } from "../hooks/useUsers";
+import type { Task, User } from "../types/Authtypes";
 import useAuth from "../hooks/useAuth";
 
 // ✅ Schema
@@ -28,7 +29,7 @@ const taskSchema = z.object({
   due_date: z.string().optional(),
   priority: z.enum(["Low", "Medium", "High"]).optional(),
   created_by: z.number().optional(),
-  assigned_to: z.number().optional(),
+  assigned_to: z.string().optional(),
 });
 
 type TaskFormDataZod = z.infer<typeof taskSchema>;
@@ -41,6 +42,7 @@ interface TaskPopupProps {
 
 const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   const { auth } = useAuth();
+  const { data: users } = useUsers();
   const createTaskMutation = useCreateTask();
   const updateTaskMutation = useUpdateTask();
 
@@ -66,7 +68,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
         due_date: task.due_date,
         priority: task.priority as (typeof priorityOptions)[number],
         created_by: task.created_by,
-        assigned_to: task.assigned_to,
+        assigned_to: task.assigned_to?.toString(),
       });
     } else {
       // Create mode defaults
@@ -77,7 +79,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
         due_date: "",
         priority: priorityOptions[0],
         created_by: auth.user_info.id,
-        assigned_to: 0,
+        assigned_to: "0",
       });
     }
   }, [task, reset, auth]);
@@ -90,22 +92,33 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   const onSubmit: SubmitHandler<TaskFormDataZod> = (data) => {
     if (!auth?.user_info) return;
 
+    const assignedToId = data.assigned_to ? parseInt(data.assigned_to, 10) : 0;
+    if (isNaN(assignedToId)) {
+        // Handle error case, maybe show a toast message
+        return;
+    }
+
     const safeData = {
       title: data.title,
       status: data.status,
       description: data.description ?? "",
       due_date: data.due_date ?? "",
       priority: data.priority ?? "Low",
-      created_by: data.created_by ?? auth.user_info.id,
-      assigned_to: data.assigned_to ?? 0,
+      created_by: auth.user_info.id,
+      assigned_to: assignedToId,
+    };
+
+    const options = {
+        onSuccess: () => {
+            onOpenChange(false);
+        }
     };
 
     if (task) {
-      updateTaskMutation.mutate({ ...safeData, id: task.id });
+      updateTaskMutation.mutate({ ...safeData, id: task.id }, options);
     } else {
-      createTaskMutation.mutate(safeData);
+      createTaskMutation.mutate(safeData, options);
     }
-    onOpenChange(false);
   };
 
   // Show loader or null until auth loaded
@@ -175,23 +188,35 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
               )}
             />
 
-            <TextField.Root
-              placeholder="Due Date"
+            <input
+              type="date"
               {...register("due_date")}
               disabled={!isCreateMode && !(isSuperAdmin ?? false)}
+              className="px-3 py-2 border rounded-md w-full"
             />
 
-            <TextField.Root
-              placeholder="Created By"
-              {...register("created_by")}
-              disabled
-            />
-
-            <TextField.Root
-              placeholder="Assigned To"
-              type="number"
-              {...register("assigned_to")}
-              disabled={!isCreateMode && !(isSuperAdmin ?? false)}
+            <Controller
+              name="assigned_to"
+              control={control}
+              render={({ field }) => (
+                <Select.Root
+                  onValueChange={field.onChange}
+                  value={field.value?.toString()}
+                  disabled={!isCreateMode && !(isSuperAdmin ?? false)}
+                >
+                  <Select.Trigger placeholder="Assigned To" />
+                  <Select.Content>
+                    <Select.Item value={auth.user_info.id.toString()}>
+                      Self Assign
+                    </Select.Item>
+                    {users?.map((user: User) => (
+                      <Select.Item key={user.id} value={user.id.toString()}>
+                        {user.username}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Root>
+              )}
             />
           </Flex>
 
@@ -205,7 +230,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
             <Button type="submit">Save</Button>
           </Flex>
         </form>
-      </Dialog.Content>.
+      </Dialog.Content>
     </Dialog.Root>
   );
 };

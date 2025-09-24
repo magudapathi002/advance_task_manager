@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.tasks.models import Task
+from ..tasks.models import Task
 from .serializers import UserCreateSerializer
 
 
@@ -48,6 +48,8 @@ def user_list(request):
 
     return Response(user_data)
 
+from .services import UserService
+
 class UserDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -59,18 +61,11 @@ class UserDeleteAPIView(APIView):
         except User.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if the user has any tasks (either created or assigned)
-        tasks_count = Task.objects.filter(Q(created_by=user) | Q(assigned_to=user)).count()
-
-        if tasks_count > 0:
-            return Response({
-                "detail": "This user cannot be deleted because they have tasks assigned or created."
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Delete the user if they have no tasks
-        user.delete()
-
-        return Response({"detail": "User deleted successfully."}, status=status.HTTP_200_OK)
+        try:
+            UserService.delete_user(user)
+            return Response({"detail": "User deleted successfully."}, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])

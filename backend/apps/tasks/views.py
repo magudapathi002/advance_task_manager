@@ -31,6 +31,11 @@ class TaskViewSet(viewsets.ModelViewSet):
         except ValueError as e:
             raise ValidationError({"detail": str(e)})
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        TaskService.delete_task(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class DashboardAPIView(APIView):
     permission_classes = [IsAuthenticated]

@@ -30,6 +30,9 @@ class TaskService:
         return task
 
     @staticmethod
+    def delete_task(task: Task):
+        task.delete()
+
     def get_dashboard_data(user: User, tasks_filter):
         total_tasks = tasks_filter.count()
 

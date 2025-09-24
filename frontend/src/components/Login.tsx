@@ -10,6 +10,9 @@ import {
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { useState } from "react";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 type Inputs = {
   username: string;
@@ -18,6 +21,7 @@ type Inputs = {
 
 const Login = () => {
   const { login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const {
     register,
@@ -69,11 +73,23 @@ const Login = () => {
               <div className="space-y-1">
                 <TextField.Root
                   size="3"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   className="focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   {...register("password", { required: "Password is required" })}
-                />
+                >
+                  <TextField.Slot
+          side="right"
+          className="cursor-pointer"
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? (
+            <VisibilityOff className="w-4 h-4 cursor-pointer text-gray-500" />
+          ) : (
+            <Visibility className="w-4 h-4 cursor-pointer text-gray-500" />
+          )}
+        </TextField.Slot>
+                </TextField.Root>
                 {errors.password && (
                   <Text size="1" color="red" className="mt-1">
                     {errors.password.message}

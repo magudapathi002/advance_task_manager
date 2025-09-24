@@ -95,10 +95,13 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   }, [task, reset, auth]);
 
   // Determine disabled state for fields
-  const isSuperAdmin = auth?.user_info?.is_superadmin ?? false;
+  const isSuperAdmin = auth?.user_info?.is_superuser;
   const isStaff = auth?.user_info?.is_staff ?? false;
   const isCreateMode = !task;
   const isEditDisabled = !isCreateMode && !isSuperAdmin;
+
+  console.log(isSuperAdmin,"super....");
+
 
 
   const onSubmit: SubmitHandler<TaskFormDataZod> = (data) => {

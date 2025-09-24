@@ -1,14 +1,18 @@
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import {
+  DataGrid,
+  GridActionsCellItem,
+  type GridColDef,
+} from "@mui/x-data-grid";
+import { Button } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { getTasks } from "../api/FetchFucntions";
-import { Button } from "@radix-ui/themes";
 import useAuth from "../hooks/useAuth";
 import { useDeleteTask } from "../hooks/useTasks";
 import TaskPopup from "../popup/TaskPopup";
 import type { Task } from "../types/Authtypes";
-import { DataGrid, GridActionsCellItem, type GridColDef } from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 
 const Tasks = () => {
   const { auth, loading } = useAuth();
@@ -73,49 +77,53 @@ const Tasks = () => {
       editable: false,
     },
     {
-    field: "actions",
-    type: "actions",
-    headerName: "Actions",
-    width: 100,
-    getActions: (params) => {
-      const actions = [
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={() => handleEditTask(params.row)}
-          showInMenu={false}
-        />,
-      ];
-
-      if (auth?.user_info?.is_superadmin) {
-        actions.push(
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      width: 100,
+      getActions: (params) => {
+        const actions = [
           <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            onClick={() => handleDeleteTask(params.row.id)}
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() => handleEditTask(params.row)}
             showInMenu={false}
-          />
-        );
-      }
-      return actions;
+          />,
+        ];
+
+        if (auth?.user_info?.is_superuser) {
+          actions.push(
+            <GridActionsCellItem
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={() => handleDeleteTask(params.row.id)}
+              showInMenu={false}
+            />
+          );
+        }
+        return actions;
+      },
     },
-  }
   ];
 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
-      <Button
-        onClick={() => {
-          setSelectedTask(null);
-          setOpen(true);
-        }}
-      >
-        Add Task
-      </Button>
-      <TaskPopup open={open} onOpenChange={setOpen} task={selectedTask} />
-      <DataGrid rows={tasks} columns={columns}/>
+    <div className="flex flex-col gap-1.5">
+      <div>
+        <Button
+          onClick={() => {
+            setSelectedTask(null);
+            setOpen(true);
+          }}
+        >
+          Add Task
+        </Button>
+      </div>
+      <div>
+        <TaskPopup open={open} onOpenChange={setOpen} task={selectedTask} />
+        <DataGrid rows={tasks} columns={columns} />
+      </div>
       {/* {isLoading ? (
         <p>Loading tasks...</p>
       ) : (

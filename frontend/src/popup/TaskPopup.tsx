@@ -214,11 +214,13 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
                         Self Assign
                       </Select.Item>
                     )}
-                    {users?.map((user: User) => (
-                      <Select.Item key={user.id} value={user.id.toString()}>
-                        {user.username}
-                      </Select.Item>
-                    ))}
+                    {users
+                      ?.filter((user: User) => user.id !== auth?.user_info?.id)
+                      .map((user: User) => (
+                        <Select.Item key={user.id} value={user.id.toString()}>
+                          {user.username}
+                        </Select.Item>
+                      ))}
                   </Select.Content>
                 </Select.Root>
               )}

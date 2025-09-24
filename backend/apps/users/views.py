@@ -71,17 +71,21 @@ class UserDeleteAPIView(APIView):
 @permission_classes([IsAuthenticated])
 def update_user_info(request, id):
     try:
-        user = User.objects.get(id=id)  # Assuming 'User' is your user model
+        user = User.objects.get(id=id)
     except User.DoesNotExist:
         raise NotFound("User not found.")
 
-    # if user != request.user:  # Optionally, prevent users from updating others' data
-    #     return Response({"detail": "You cannot update this user."}, status=403)
+    # Basic permission check, can be expanded
+    if not request.user.is_staff and user != request.user:
+        return Response({"detail": "You do not have permission to update this user."}, status=status.HTTP_403_FORBIDDEN)
 
-    user.email = request.data.get('email', user.email)
-    user.first_name = request.data.get('first_name', user.first_name)
-    user.last_name = request.data.get('last_name', user.last_name)
-    user.save()
+    data_to_update = {
+        'email': request.data.get('email', user.email),
+        'first_name': request.data.get('first_name', user.first_name),
+        'last_name': request.data.get('last_name', user.last_name),
+    }
+
+    UserService.update_user(user, **data_to_update)
 
     return Response({"message": "User updated successfully."})
 

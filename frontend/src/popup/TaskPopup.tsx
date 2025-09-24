@@ -111,6 +111,9 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
     const options = {
         onSuccess: () => {
             onOpenChange(false);
+        },
+        onError: () => {
+            onOpenChange(false);
         }
     };
 
@@ -206,9 +209,11 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
                 >
                   <Select.Trigger placeholder="Assigned To" />
                   <Select.Content>
-                    <Select.Item value={auth.user_info.id.toString()}>
-                      Self Assign
-                    </Select.Item>
+                    {auth?.user_info && (
+                      <Select.Item value={auth.user_info.id.toString()}>
+                        Self Assign
+                      </Select.Item>
+                    )}
                     {users?.map((user: User) => (
                       <Select.Item key={user.id} value={user.id.toString()}>
                         {user.username}

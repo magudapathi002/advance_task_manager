@@ -24,3 +24,13 @@ class UserService:
             raise ValueError("This user cannot be deleted because they have tasks assigned or created.")
 
         user_to_delete.delete()
+
+    @staticmethod
+    def update_user(user_to_update: User, **kwargs):
+        """
+        Updates a user's information.
+        """
+        for key, value in kwargs.items():
+            setattr(user_to_update, key, value)
+        user_to_update.save()
+        return user_to_update

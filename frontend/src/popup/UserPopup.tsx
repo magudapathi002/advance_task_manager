@@ -6,19 +6,25 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { useCreateUser, useUpdateUser } from "../hooks/useUsers";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { User } from "../types/Authtypes";
 
 // ✅ Schema
-const userSchema = z.object({
-  username: z.string().min(2, "Username must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  first_name: z.string().optional(),
-  last_name: z.string().optional(),
-  password: z.string().min(6, "Password must be at least 6 characters").optional(),
-  is_superuser: z.boolean().default(false).optional(),
-  is_staff: z.boolean().default(false).optional(),
-});
+const userSchema = z
+  .object({
+    username: z.string().min(2, "Username must be at least 2 characters"),
+    email: z.string().email("Invalid email address"),
+    first_name: z.string().optional(),
+    last_name: z.string().optional(),
+    password: z.string().min(6, "Password must be at least 6 characters").optional(),
+    confirmPassword: z.string().optional(),
+    is_superuser: z.boolean().default(false).optional(),
+    is_staff: z.boolean().default(false).optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type UserFormData = z.infer<typeof userSchema>;
 
@@ -29,6 +35,7 @@ interface UserPopupProps {
 }
 
 const UserPopup = ({ user, open, onOpenChange }: UserPopupProps) => {
+  const [showPassword, setShowPassword] = useState(false);
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
 
@@ -59,8 +66,13 @@ const UserPopup = ({ user, open, onOpenChange }: UserPopupProps) => {
   }, [user, reset]);
 
   const onSubmit = (data: UserFormData) => {
+    const payload = { ...data };
+    if (user && !showPassword) {
+      delete payload.password;
+    }
+
     if (user) {
-      updateUser.mutate({ id: user.id, data }, {
+      updateUser.mutate({ id: user.id, data: payload }, {
         onSuccess: () => {
           toast.success("User updated successfully");
           onOpenChange(false);
@@ -116,14 +128,34 @@ const UserPopup = ({ user, open, onOpenChange }: UserPopupProps) => {
             />
             {errors.email && <Text color="red">{errors.email.message}</Text>}
 
-            <TextField.Root
-              type="password"
-              placeholder="Password"
-              {...register("password")}
-              autoComplete="off"
-            />
-            {errors.password && (
-              <Text color="red">{errors.password.message}</Text>
+            {user && !showPassword && (
+              <Button type="button" onClick={() => setShowPassword(true)}>
+                Change Password
+              </Button>
+            )}
+
+            {(!user || showPassword) && (
+              <>
+                <TextField.Root
+                  type="password"
+                  placeholder="Password"
+                  {...register("password")}
+                  autoComplete="off"
+                />
+                {errors.password && (
+                  <Text color="red">{errors.password.message}</Text>
+                )}
+
+                <TextField.Root
+                  type="password"
+                  placeholder="Confirm Password"
+                  {...register("confirmPassword")}
+                  autoComplete="off"
+                />
+                {errors.confirmPassword && (
+                  <Text color="red">{errors.confirmPassword.message}</Text>
+                )}
+              </>
             )}
             {/* ✅ Admin toggle */}
             <Flex gap="3">

@@ -101,7 +101,6 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   const isEditDisabled = !isCreateMode && !isSuperAdmin;
 
   console.log(isSuperAdmin,"super....");
-  
 
 
   const onSubmit: SubmitHandler<TaskFormDataZod> = (data) => {

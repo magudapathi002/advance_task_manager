@@ -2,18 +2,21 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { getTasks } from "../api/FetchFucntions";
 import { Button } from "@radix-ui/themes";
-// import useAuth from "../hooks/useAuth";
+import useAuth from "../hooks/useAuth";
+import { useDeleteTask } from "../hooks/useTasks";
 import TaskPopup from "../popup/TaskPopup";
 import type { Task } from "../types/Authtypes";
 import { DataGrid, GridActionsCellItem, type GridColDef } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Tasks = () => {
-  // const { auth } = useAuth();
+  const { auth } = useAuth();
   const { data: tasks = [] } = useQuery<Task[]>({
     queryKey: ["tasks"],
     queryFn: getTasks,
   });
+  const deleteTaskMutation = useDeleteTask();
 
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -23,13 +26,16 @@ const Tasks = () => {
     setOpen(true);
   };
 
+  const handleDeleteTask = (id: number) => {
+    deleteTaskMutation.mutate(id);
+  };
+
   const columns: GridColDef[] = [
     { field: "title", headerName: "Title", minWidth: 150, editable: true },
     {
       field: "description",
       headerName: "Description",
       minWidth: 200,
-      // editable: isAdmin,
     },
     {
       field: "due_date",
@@ -48,21 +54,17 @@ const Tasks = () => {
       minWidth: 150,
       editable: true,
       type: "singleSelect",
-      // valueOptions: statusOptions,
     },
     {
       field: "priority",
       headerName: "Priority",
       minWidth: 150,
-      // editable: isAdmin,
       type: "singleSelect",
-      // valueOptions: priorityOptions,
     },
     {
       field: "assigned_to_username",
       headerName: "Assigned To",
       minWidth: 200,
-      // editable: isAdmin,
     },
     {
       field: "created_by_username",
@@ -75,14 +77,28 @@ const Tasks = () => {
     type: "actions",
     headerName: "Actions",
     width: 100,
-    getActions: (params) => [
-      <GridActionsCellItem
-        icon={<EditIcon />}
-        label="Edit"
-        onClick={() => handleEditTask(params.row)}
-        showInMenu={false}
-      />,
-    ],
+    getActions: (params) => {
+      const actions = [
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={() => handleEditTask(params.row)}
+          showInMenu={false}
+        />,
+      ];
+
+      if (auth?.user_info?.is_superadmin) {
+        actions.push(
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={() => handleDeleteTask(params.row.id)}
+            showInMenu={false}
+          />
+        );
+      }
+      return actions;
+    },
   }
   ];
 

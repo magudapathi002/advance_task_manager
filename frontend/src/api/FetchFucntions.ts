@@ -41,8 +41,3 @@ export const deleteUser = async (id: number) => {
   const response = await API.delete(`users/delete/${id}/`);
   return response.data;
 };
-=======
-export const UserGet =async()=>{
-    const res = await API.get("users/list/")
-    return res.data
-}

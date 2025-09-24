@@ -1,74 +1,62 @@
-import { useState } from "react";
-import axios from "../api/axios";
-import type { Task } from "../types/Authtypes";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getTasks, createTask, updateTask, deleteTask } from "../api/FetchFucntions";
+import toast from "react-hot-toast";
 
-const useTasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-
-  const createTask = async (task: Omit<Task, "id">) => {
-    try {
-      const response = await axios.post("tasks", task);
-      setTasks([...tasks, response.data]);
-    } catch (error: any) {
-      setError(error.message);
-    }
-  };
-
-const updateTask = async ({ id, task }: { id: number; task: Task }) => {
-  try {
-    const response = await axios.put(`tasks/${id}/`, task);
-    setTasks(tasks.map((t) => (t.id === id ? response.data : t)));
-    return response.data;
-  } catch (error: any) {
-    setError(error.message);
-    throw error;
-  }
+export const useTasks = () => {
+  return useQuery({
+    queryKey: ["tasks"],
+    queryFn: getTasks,
+  });
 };
 
-  const deleteTask = async (id: number) => {
-    try {
-      await axios.delete(`tasks/${id}/`);
-      setTasks(tasks.filter((t) => t.id !== id));
-    } catch (error: any) {
-      setError(error.message);
-    }
-  };
-
-  return {
-    tasks,
-    error,
-    createTask: createTask,
-    updateTask: updateTask,
-    deleteTask: deleteTask,
-    statusOptions: statusOptions,
-    priorityOptions: priorityOptions,
-  };
+export const useCreateTask = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      toast.success("Task created successfully!");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.title || "Failed to create task.");
+    },
+  });
 };
 
-const statusOptions = [
+export const useUpdateTask = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      toast.success("Task updated successfully!");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.title || "Failed to update task.");
+    },
+  });
+};
+
+export const useDeleteTask = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      toast.success("Task deleted successfully!");
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.detail || "Failed to delete task.");
+    },
+  });
+};
+
+export const statusOptions = [
   "Not Started",
   "In Progress",
   "Pending",
   "On Hold",
   "Completed",
 ] as const;
-const priorityOptions = ["Low", "Medium", "High"] as const;
 
-const useCreateTask = () => {
-  const { createTask } = useTasks();
-  return createTask;
-};
-
-const useUpdateTask = () => {
-  const { updateTask } = useTasks();
-  return updateTask;
-};
-
-const useDeleteTask = () => {
-  const { deleteTask } = useTasks();
-  return deleteTask;
-};
-
-export { useTasks, useCreateTask, useUpdateTask, useDeleteTask };
+export const priorityOptions = ["Low", "Medium", "High"] as const;

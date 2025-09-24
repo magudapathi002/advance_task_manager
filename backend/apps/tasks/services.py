@@ -19,13 +19,21 @@ class TaskService:
         return Task.objects.create(created_by=user, title=title, **kwargs)
 
     @staticmethod
-    def update_task(task: Task, user: User, title: str, **kwargs):
-        if title and Task.objects.filter(title=title, created_by=user).exclude(pk=task.pk).exists():
+    def update_task(task: Task, user: User, **kwargs):
+        if user.is_superuser:
+            # Superuser can update any field
+            for key, value in kwargs.items():
+                setattr(task, key, value)
+        else:
+            # If the user is not a superuser, only allow updating the 'status' field
+            if 'status' in kwargs:
+                task.status = kwargs['status']
+            # We will ignore any other fields passed by non-superusers
+
+        # Handle title uniqueness check if title is being updated
+        if 'title' in kwargs and Task.objects.filter(title=kwargs['title'], created_by=user).exclude(pk=task.pk).exists():
             raise ValueError("You already have another task with this title.")
 
-        task.title = title if title else task.title
-        for key, value in kwargs.items():
-            setattr(task, key, value)
         task.save()
         return task
 

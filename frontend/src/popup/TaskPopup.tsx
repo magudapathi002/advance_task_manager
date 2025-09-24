@@ -43,6 +43,16 @@ interface TaskPopupProps {
 const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   const { auth } = useAuth();
   const { data: users } = useUsers();
+
+  const commonMutationOptions = {
+    onSuccess: () => {
+        onOpenChange(false);
+    },
+    onError: () => {
+        onOpenChange(false);
+    }
+  };
+
   const createTaskMutation = useCreateTask();
   const updateTaskMutation = useUpdateTask();
 
@@ -85,9 +95,11 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   }, [task, reset, auth]);
 
   // Determine disabled state for fields
-  const isSuperAdmin = auth?.user_info?.is_superadmin;
-  const isStaff = auth?.user_info?.is_staff;
+  const isSuperAdmin = auth?.user_info?.is_superadmin ?? false;
+  const isStaff = auth?.user_info?.is_staff ?? false;
   const isCreateMode = !task;
+  const isEditDisabled = !isCreateMode && !isSuperAdmin;
+
 
   const onSubmit: SubmitHandler<TaskFormDataZod> = (data) => {
     if (!auth?.user_info) return;
@@ -108,19 +120,10 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
       assigned_to: assignedToId,
     };
 
-    const options = {
-        onSuccess: () => {
-            onOpenChange(false);
-        },
-        onError: () => {
-            onOpenChange(false);
-        }
-    };
-
     if (task) {
-      updateTaskMutation.mutate({ ...safeData, id: task.id }, options);
+      updateTaskMutation.mutate({ ...safeData, id: task.id }, commonMutationOptions);
     } else {
-      createTaskMutation.mutate(safeData, options);
+      createTaskMutation.mutate(safeData, commonMutationOptions);
     }
   };
 
@@ -137,14 +140,14 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
             <TextField.Root
               placeholder="Title"
               {...register("title")}
-              disabled={!isCreateMode && !(isSuperAdmin ?? false)}
+              disabled={isEditDisabled}
             />
             {errors.title && <Text color="red">{errors.title.message}</Text>}
 
             <TextField.Root
               placeholder="Description"
               {...register("description")}
-              disabled={!isCreateMode && !(isSuperAdmin ?? false)}
+              disabled={isEditDisabled}
             />
 
             <Controller
@@ -153,7 +156,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
               defaultValue={statusOptions[0]}
               render={({ field }) => (
                 <Select.Root
-                  disabled={!isCreateMode && !(isSuperAdmin ?? false) && !(isStaff ?? false)}
+                  disabled={!isCreateMode && !isSuperAdmin && !isStaff}
                   onValueChange={field.onChange}
                   value={field.value}
                 >
@@ -175,7 +178,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
               defaultValue={priorityOptions[0]}
               render={({ field }) => (
                 <Select.Root
-                  disabled={!isCreateMode && !(isSuperAdmin ?? false)}
+                  disabled={isEditDisabled}
                   onValueChange={field.onChange}
                   value={field.value}
                 >
@@ -194,7 +197,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
             <input
               type="date"
               {...register("due_date")}
-              disabled={!isCreateMode && !(isSuperAdmin ?? false)}
+              disabled={isEditDisabled}
               className="px-3 py-2 border rounded-md w-full"
             />
 
@@ -205,7 +208,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
                 <Select.Root
                   onValueChange={field.onChange}
                   value={field.value?.toString()}
-                  disabled={!isCreateMode && !(isSuperAdmin ?? false)}
+                  disabled={isEditDisabled}
                 >
                   <Select.Trigger placeholder="Assigned To" />
                   <Select.Content>

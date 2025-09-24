@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { GetTasks } from "../api/FetchFucntions";
+import { getTasks } from "../api/FetchFucntions";
 import { Button } from "@radix-ui/themes";
 // import useAuth from "../hooks/useAuth";
 import TaskPopup from "../popup/TaskPopup";
@@ -12,7 +12,7 @@ const Tasks = () => {
   // const { auth } = useAuth();
   const { data: tasks = [] } = useQuery<Task[]>({
     queryKey: ["tasks"],
-    queryFn: GetTasks,
+    queryFn: getTasks,
   });
 
   const [open, setOpen] = useState(false);

@@ -9,22 +9,10 @@ import {
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
 import { useEffect } from "react";
-import { useTasks } from "../hooks/useTasks";
+import { useCreateTask, useUpdateTask, statusOptions, priorityOptions } from "../hooks/useTasks";
 import type { Task } from "../types/Authtypes";
 import useAuth from "../hooks/useAuth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-const statusOptions = [
-  "Not Started",
-  "In Progress",
-  "Pending",
-  "On Hold",
-  "Completed",
-];
-
-const priorityOptions = ["Low", "Medium", "High"] as const;
 
 // ✅ Schema
 const taskSchema = z.object({
@@ -53,28 +41,8 @@ interface TaskPopupProps {
 
 const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   const { auth } = useAuth();
-  const { createTask, updateTask } = useTasks();
-  const queryClient = useQueryClient();
-
-  const createTaskMutation = useMutation({
-    mutationFn: createTask,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Task created successfully");
-      onOpenChange(false);
-    },
-    onError: () => toast.error("Failed to create task"),
-  });
-
-  const updateTaskMutation = useMutation({
-    mutationFn: updateTask,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      toast.success("Task updated successfully");
-      onOpenChange(false);
-    },
-    onError: () => toast.error("Failed to update task"),
-  });
+  const createTaskMutation = useCreateTask();
+  const updateTaskMutation = useUpdateTask();
 
   const {
     register,
@@ -116,15 +84,13 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
 
   // Determine disabled state for fields
   const isSuperAdmin = auth?.user_info?.is_superadmin;
-  console.log(auth,"asdfghjk");
-  
   const isStaff = auth?.user_info?.is_staff;
   const isCreateMode = !task;
 
   const onSubmit: SubmitHandler<TaskFormDataZod> = (data) => {
     if (!auth?.user_info) return;
 
-    const safeData: Omit<Task, "id"> = {
+    const safeData = {
       title: data.title,
       status: data.status,
       description: data.description ?? "",
@@ -135,13 +101,11 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
     };
 
     if (task) {
-      updateTaskMutation.mutate({
-        id: task.id,
-        task: { ...task, ...safeData },
-      });
+      updateTaskMutation.mutate({ ...safeData, id: task.id });
     } else {
       createTaskMutation.mutate(safeData);
     }
+    onOpenChange(false);
   };
 
   // Show loader or null until auth loaded
@@ -241,7 +205,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
             <Button type="submit">Save</Button>
           </Flex>
         </form>
-      </Dialog.Content>
+      </Dialog.Content>.
     </Dialog.Root>
   );
 };

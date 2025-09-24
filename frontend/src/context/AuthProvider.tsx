@@ -29,8 +29,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: PropsWit
 
       localStorage.setItem("authTokens", JSON.stringify(tokens));
 
-      const userInfo = await API.get("users/info/");
-      const user_list = await API.get("users/list/");
+      const userInfo = await API.get("user-info/");
+      const user_list = await API.get("user_list/");
       const authData: AuthState = {
         tokens,
         user_info: userInfo?.data,
@@ -85,8 +85,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: PropsWit
       if (stored) {
         const tokens = JSON.parse(stored);
         try {
-          const userInfo = await API.get("users/info/");
-          const user_list = await API.get("users/list/");
+          const userInfo = await API.get("user-info/");
+          const user_list = await API.get("user_list/");
           setAuth({
             tokens,
             user_info: userInfo.data,

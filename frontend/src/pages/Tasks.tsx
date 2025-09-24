@@ -11,8 +11,8 @@ import { useState } from "react";
 import { getTasks } from "../api/FetchFucntions";
 import useAuth from "../hooks/useAuth";
 import { useDeleteTask } from "../hooks/useTasks";
-import TaskPopup from "../popup/TaskPopup";
-import type { Task } from "../types/Authtypes";
+import TaskPopup from "../components/popups/TaskPopup";
+import type { Task } from "../types/task";
 
 const Tasks = () => {
   const { auth, loading } = useAuth();

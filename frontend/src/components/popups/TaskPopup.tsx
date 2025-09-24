@@ -9,11 +9,12 @@ import {
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
-import { useCreateTask, useUpdateTask, statusOptions, priorityOptions } from "../hooks/useTasks";
-import { useUsers } from "../hooks/useUsers";
-import type { Task, User } from "../types/Authtypes";
-import useAuth from "../hooks/useAuth";
+import { useEffect, useState } from "react";
+import { useCreateTask, useUpdateTask, statusOptions, priorityOptions } from "../../hooks/useTasks";
+import { useUsers } from "../../hooks/useUsers";
+import type { Task } from "../../types/task";
+import type { User } from "../../types/user";
+import useAuth from "../../hooks/useAuth";
 
 // ✅ Schema
 const taskSchema = z.object({
@@ -95,12 +96,10 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   }, [task, reset, auth]);
 
   // Determine disabled state for fields
-  const isSuperAdmin = auth?.user_info?.is_superuser;
+  const isSuperAdmin = auth?.user_info?.is_superuser ?? false;
   const isStaff = auth?.user_info?.is_staff ?? false;
   const isCreateMode = !task;
   const isEditDisabled = !isCreateMode && !isSuperAdmin;
-
-  console.log(isSuperAdmin,"super....");
 
 
   const onSubmit: SubmitHandler<TaskFormDataZod> = (data) => {

@@ -12,7 +12,7 @@ import {
 import { DashboardLayout } from "@toolpad/core/DashboardLayout";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
+import useAuth from "../../hooks/useAuth";
 
 type CustomNavigationItem = ToolpadNavigationItem & {
   requiredPermissions?: string[];
@@ -70,6 +70,7 @@ const ToolpadDashboardLayout: React.FC<Props> = ({ children }) => {
     user: {
       name: auth?.user_info?.first_name,
       email: auth?.user_info?.email,
+      image:auth?.user_info?.first_name
     },
   };
 

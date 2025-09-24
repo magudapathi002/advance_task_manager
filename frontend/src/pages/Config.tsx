@@ -1,5 +1,5 @@
 import { Toaster } from "react-hot-toast";
-import UserTable from "../components/UserTable";
+import UserTable from "../components/tables/UserTable";
 // import UserPopup from "../popup/UserPopup";
 
 export default function Config() {

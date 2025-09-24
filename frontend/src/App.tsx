@@ -2,10 +2,10 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Config from "./pages/Config";
 import Dashboard from "./pages/Dashboard";
-import Layout from "./components/Layout";
-import Login from "./components/Login";
+import Layout from "./components/layout/Layout";
+import Login from "./pages/LoginPage";
 import RequireAuth from "./components/RequireAuth";
-import ToolpadDashboardLayout from "./components/SideBar";
+import ToolpadDashboardLayout from "./components/layout/SideBar";
 import Tasks from "./pages/Tasks";
 
 function App() {

@@ -16,7 +16,7 @@ const userSchema = z.object({
   first_name: z.string().optional(),
   last_name: z.string().optional(),
   password: z.string().min(6, "Password must be at least 6 characters").optional(),
-  is_superadmin: z.boolean().default(false).optional(),
+  is_superuser: z.boolean().default(false).optional(),
   is_staff: z.boolean().default(false).optional(),
 });
 
@@ -52,7 +52,7 @@ const UserPopup = ({ user, open, onOpenChange }: UserPopupProps) => {
         first_name: "",
         last_name: "",
         password: "",
-        is_superadmin: false,
+        is_superuser: false,
         is_staff: false,
       });
     }
@@ -129,7 +129,7 @@ const UserPopup = ({ user, open, onOpenChange }: UserPopupProps) => {
             <Flex gap="3">
               <Flex align="center" gap="2" mt="2">
                 <Controller
-                  name="is_superadmin"
+                  name="is_superuser"
                   control={control}
                   render={({ field }) => (
                     <>

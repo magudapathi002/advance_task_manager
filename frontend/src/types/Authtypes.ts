@@ -9,7 +9,7 @@ export interface User {
   first_name: string;
   email: string;
   is_staff: boolean;
-  is_superadmin: boolean;
+  is_superuser: boolean;
   groups: any[];
   permissions: string[];
 }

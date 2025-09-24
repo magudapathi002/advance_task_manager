@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type PropsWithChildren, type ReactNode } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import API from "../api/axios";
-import type { AuthObject, AuthState, LoginProps } from "../types/Authtypes";
+import type { AuthState, LoginProps } from "../types/auth";
 import { AuthContext } from "./AuthContext";
 
 const AUTH_URL = "login/";

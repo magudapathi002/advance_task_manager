@@ -6,9 +6,9 @@ import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useDeleteUser, useUsers } from "../hooks/useUsers";
-import UserPopup from "../popup/UserPopup";
-import type { User } from "../types/Authtypes";
+import { useDeleteUser, useUsers } from "../../hooks/useUsers";
+import UserPopup from "../popups/UserPopup";
+import type { User } from "../../types/user";
 
 export default function UserTable() {
   const { data: users = [], isLoading } = useUsers();

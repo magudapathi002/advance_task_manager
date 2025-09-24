@@ -1,19 +1,18 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import {
-  AlertDialog,
   DataGrid,
   GridActionsCellItem,
   type GridColDef,
 } from "@mui/x-data-grid";
-import { Button, Flex, Text } from "@radix-ui/themes";
+import { Button, Flex, AlertDialog } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { getTasks } from "../api/FetchFucntions";
 import useAuth from "../hooks/useAuth";
 import { useDeleteTask } from "../hooks/useTasks";
-import TaskPopup from "../popup/TaskPopup";
-import type { Task } from "../types/Authtypes";
+import TaskPopup from "../components/popups/TaskPopup";
+import type { Task } from "../types/task";
 
 const Tasks = () => {
   const { auth, loading } = useAuth();

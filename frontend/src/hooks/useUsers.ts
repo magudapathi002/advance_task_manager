@@ -7,7 +7,7 @@ export const useUsers = () => {
   return useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const res = await API.get("user_list/");
+      const res = await API.get("users/list/");
       return res.data;
     },
   });

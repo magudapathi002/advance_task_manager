@@ -21,6 +21,6 @@ export const DeleteTask = async (id: string | number) => {
 };
 
 export const UserGet =async()=>{
-    const res = await API.get("user_list/")
+    const res = await API.get("users/list/")
     return res.data
 }

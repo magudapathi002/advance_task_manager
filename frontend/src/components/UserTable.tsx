@@ -3,7 +3,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import type { GridColDef } from "@mui/x-data-grid";
 import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { Button } from "@radix-ui/themes";
+import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDeleteUser, useUsers } from "../hooks/useUsers";
@@ -15,6 +15,8 @@ export default function UserTable() {
   const deleteUser = useDeleteUser();
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -27,9 +29,8 @@ export default function UserTable() {
   };
 
   const handleDelete = (id: number) => {
-    deleteUser.mutate(id, {
-      onSuccess: () => toast.success("User deleted"),
-    });
+    setUserToDelete(id);
+    setDeleteDialogOpen(true);
   };
 
 
@@ -84,6 +85,33 @@ export default function UserTable() {
         open={popupOpen}
         onOpenChange={setPopupOpen}
       />
+      <AlertDialog.Root open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialog.Content>
+          <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
+          <AlertDialog.Description>
+            Are you sure you want to delete this user? This action cannot be undone.
+          </AlertDialog.Description>
+          <Flex gap="3" mt="4" justify="end">
+            <AlertDialog.Cancel>
+              <Button variant="soft" color="gray">
+                Cancel
+              </Button>
+            </AlertDialog.Cancel>
+            <AlertDialog.Action>
+              <Button variant="solid" color="red" onClick={() => {
+                if (userToDelete) {
+                  deleteUser.mutate(userToDelete, {
+                    onSuccess: () => toast.success("User deleted"),
+                  });
+                }
+                setDeleteDialogOpen(false);
+              }}>
+                Delete
+              </Button>
+            </AlertDialog.Action>
+          </Flex>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
     </div>
   );
 }

@@ -59,14 +59,13 @@ const Tasks = () => {
       // valueOptions: priorityOptions,
     },
     {
-      field: "assigned_to",
+      field: "assigned_to_username",
       headerName: "Assigned To",
       minWidth: 200,
       // editable: isAdmin,
-      type: "singleSelect",
     },
     {
-      field: "created_by",
+      field: "created_by_username",
       headerName: "Created By",
       minWidth: 200,
       editable: false,

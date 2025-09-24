@@ -7,6 +7,8 @@ from .models import Task
 class TaskSerializer(serializers.ModelSerializer):
     priority_label = serializers.CharField(source='get_priority_display', read_only=True)
     status_label = serializers.CharField(source='get_status_display', read_only=True)
+    assigned_to_username = serializers.CharField(source='assigned_to.username', read_only=True, allow_null=True)
+    created_by_username = serializers.CharField(source='created_by.username', read_only=True)
 
     class Meta:
         model = Task

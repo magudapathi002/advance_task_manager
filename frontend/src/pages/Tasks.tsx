@@ -1,11 +1,12 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import {
+  AlertDialog,
   DataGrid,
   GridActionsCellItem,
   type GridColDef,
 } from "@mui/x-data-grid";
-import { Button } from "@radix-ui/themes";
+import { Button, Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { getTasks } from "../api/FetchFucntions";
@@ -24,6 +25,8 @@ const Tasks = () => {
 
   const [open, setOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
   const handleEditTask = (task: Task) => {
     setSelectedTask(task);
@@ -31,7 +34,8 @@ const Tasks = () => {
   };
 
   const handleDeleteTask = (id: number) => {
-    deleteTaskMutation.mutate(id);
+    setTaskToDelete(id);
+    setDeleteDialogOpen(true);
   };
 
   const columns: GridColDef[] = [
@@ -122,6 +126,31 @@ const Tasks = () => {
       </div>
       <div>
         <TaskPopup open={open} onOpenChange={setOpen} task={selectedTask} />
+        <AlertDialog.Root open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialog.Content>
+            <AlertDialog.Title>Confirm Deletion</AlertDialog.Title>
+            <AlertDialog.Description>
+              Are you sure you want to delete this task? This action cannot be undone.
+            </AlertDialog.Description>
+            <Flex gap="3" mt="4" justify="end">
+              <AlertDialog.Cancel>
+                <Button variant="soft" color="gray">
+                  Cancel
+                </Button>
+              </AlertDialog.Cancel>
+              <AlertDialog.Action>
+                <Button variant="solid" color="red" onClick={() => {
+                  if (taskToDelete) {
+                    deleteTaskMutation.mutate(taskToDelete);
+                  }
+                  setDeleteDialogOpen(false);
+                }}>
+                  Delete
+                </Button>
+              </AlertDialog.Action>
+            </Flex>
+          </AlertDialog.Content>
+        </AlertDialog.Root>
         <DataGrid rows={tasks} columns={columns} />
       </div>
       {/* {isLoading ? (

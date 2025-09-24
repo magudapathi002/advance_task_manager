@@ -15,7 +15,7 @@ import API from "../api/axios";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const fetchDashboardData = async () => {
-  const response = await API.get("dashboard/");
+  const response = await API.get("tasks/dashboard");
   return response.data;
 };
 

@@ -41,7 +41,7 @@ interface TaskPopupProps {
 }
 
 const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
-  const { auth } = useAuth();
+  const { auth, loading } = useAuth();
   const { data: users } = useUsers();
 
   const commonMutationOptions = {
@@ -128,6 +128,7 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   };
 
   // Show loader or null until auth loaded
+  if (loading) return null; // Or a loading spinner
   if (!auth?.user_info) return null;
 
   return (

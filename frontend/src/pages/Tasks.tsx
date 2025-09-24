@@ -11,7 +11,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const Tasks = () => {
-  const { auth } = useAuth();
+  const { auth, loading } = useAuth();
   const { data: tasks = [] } = useQuery<Task[]>({
     queryKey: ["tasks"],
     queryFn: getTasks,
@@ -101,6 +101,8 @@ const Tasks = () => {
     },
   }
   ];
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div>

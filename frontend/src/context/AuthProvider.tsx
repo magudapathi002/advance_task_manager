@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }: PropsWit
   });
   const [loading, setLoading] = useState<boolean>(true); // Add a loading state
 
-  const login = async ({ username, password }: LoginProps): Promise<AuthObject> => {
+  const login = async ({ username, password }: LoginProps): Promise<AuthState> => {
     try {
       const res = await API.post(AUTH_URL, { username, password });
       const tokens = res.data;

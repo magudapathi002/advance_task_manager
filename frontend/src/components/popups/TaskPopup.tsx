@@ -9,7 +9,7 @@ import {
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useCreateTask, useUpdateTask, statusOptions, priorityOptions } from "../../hooks/useTasks";
 import { useUsers } from "../../hooks/useUsers";
 import type { Task } from "../../types/task";

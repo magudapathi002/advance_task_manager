@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { useDeleteUser, useUsers } from "../../hooks/useUsers";
 import UserPopup from "../popups/UserPopup";
 import type { User } from "../../types/user";
+import Box from "@mui/material/Box";
 
 export default function UserTable() {
   const { data: users = [], isLoading } = useUsers();
@@ -70,16 +71,15 @@ export default function UserTable() {
         <h2 className="text-xl font-bold">User Management</h2>
         <Button onClick={handleAdd}>+ Add User</Button>
       </div>
-
+    <Box sx={{ height: 520, width: '100%' }}>
       <DataGrid
         rows={users}
         columns={columns}
         loading={isLoading}
         getRowId={(row) => row.id}
-        autoHeight
         pageSizeOptions={[5, 10]}
       />
-
+    </Box>
       <UserPopup
         user={selectedUser}
         open={popupOpen}

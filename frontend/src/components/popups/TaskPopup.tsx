@@ -5,12 +5,18 @@ import {
   Text,
   TextField,
   Select,
+  TextArea,
 } from "@radix-ui/themes";
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { useCreateTask, useUpdateTask, statusOptions, priorityOptions } from "../../hooks/useTasks";
+import {
+  useCreateTask,
+  useUpdateTask,
+  statusOptions,
+  priorityOptions,
+} from "../../hooks/useTasks";
 import { useUsers } from "../../hooks/useUsers";
 import type { Task } from "../../types/task";
 import type { User } from "../../types/user";
@@ -47,11 +53,11 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
 
   const commonMutationOptions = {
     onSuccess: () => {
-        onOpenChange(false);
+      onOpenChange(false);
     },
     onError: () => {
-        onOpenChange(false);
-    }
+      onOpenChange(false);
+    },
   };
 
   const createTaskMutation = useCreateTask();
@@ -101,14 +107,13 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
   const isCreateMode = !task;
   const isEditDisabled = !isCreateMode && !isSuperAdmin;
 
-
   const onSubmit: SubmitHandler<TaskFormDataZod> = (data) => {
     if (!auth?.user_info) return;
 
     const assignedToId = data.assigned_to ? parseInt(data.assigned_to, 10) : 0;
     if (isNaN(assignedToId)) {
-        // Handle error case, maybe show a toast message
-        return;
+      // Handle error case, maybe show a toast message
+      return;
     }
 
     const safeData = {
@@ -122,7 +127,10 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
     };
 
     if (task) {
-      updateTaskMutation.mutate({ ...safeData, id: task.id }, commonMutationOptions);
+      updateTaskMutation.mutate(
+        { ...safeData, id: task.id },
+        commonMutationOptions
+      );
     } else {
       createTaskMutation.mutate(safeData, commonMutationOptions);
     }
@@ -146,11 +154,13 @@ const TaskPopup = ({ task, open, onOpenChange }: TaskPopupProps) => {
             />
             {errors.title && <Text color="red">{errors.title.message}</Text>}
 
-            <TextField.Root
+            {/* <TextField.Root
               placeholder="Description"
               {...register("description")}
               disabled={isEditDisabled}
-            />
+            /> */}
+
+              <TextArea size="3"  {...register("description")} placeholder="Description" disabled={isEditDisabled} />
 
             <Controller
               name="status"

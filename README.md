@@ -1,4 +1,4 @@
-# Your Project Name
+# Task Manager
 
 A full-stack task management application built with Django and React.
 
